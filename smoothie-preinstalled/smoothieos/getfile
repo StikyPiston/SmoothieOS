@@ -1,0 +1,22 @@
+require(".smoothieos.config")
+
+term.clear()
+term.setCursorPos(1,1)
+
+rednet.open(modem)
+
+print("Getting Files...")
+
+while true do
+ id, msg = rednet.receive()
+ if msg == "RECEIVE"then
+  id2, msg2 = rednet.receive()
+  f = fs.open(msg2, "w")
+  id3, msg3 = rednet.receive()
+  f.write(msg3)
+  f.close()
+  print("File " .. msg2 .. " saved successfully!")
+  sleep(2.5)
+  shell.run("/smoothieos/back")
+ end
+end

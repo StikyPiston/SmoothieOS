@@ -1,0 +1,25 @@
+require(".smoothieos.config")
+
+term.clear()
+term.setCursorPos(1,1)
+
+print("File to send > ")
+
+rednet.open(modem)
+
+fts = read()
+
+if fs.exists(fts)then
+ textutils.slowPrint("Sending file " .. fts .. "!")
+ rednet.broadcast("RECEIVE")
+ rednet.broadcast(fts)
+ file = fs.open(fts, "r")
+ rednet.broadcast(file.readAll())
+ file.close()
+ print(fts .. " sent successfully!")
+else
+ print(fts .. " does not exist!")
+end
+
+sleep(2.5)
+shell.run("back")

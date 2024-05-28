@@ -1,0 +1,53 @@
+local function getInput(prompt)
+ term.setCursorPos(1, term.getCursorPos() + 1)
+ print(prompt)
+ term.setCursorPos(1, term.getCursorPos() + 1)
+ return read()
+end
+
+local function madLibsGame()
+ local stories = {
+  {
+   prompt = {"Enter a name:", "Enter a place:", "Enter an animal:", "Enter a verb:", "Enter an object:", "Enter an adjective:"},
+   template = "Once upon a time, %s went to %s. While there, %s saw a %s %s. It was %s and decided to %s the %s. What a day!"
+  },
+  {
+   prompt = {"Enter a name:", "Enter a food:", "Enter a color:", "Enter a verb ending in -ing:", "Enter a place:", "Enter a plural noun:"},
+   template = "One day, %s was very hungry. %s wanted to eat some %s food. So %s started %s to the %s to find some %s"
+  },
+  { 
+   prompt = {"Enter a name:", "Enter a vehicle:", "Enter a destination:", "Enter a number:", "Enter an adjective:", "Enter a past-tense verb:"}, 
+   template = "%s decided to go on an adventure. %s took a %s to %s. After travelling for %s hours, %s felt %s and %s to rest"
+  },
+  {
+   prompt = {"Enter a name:", "Enter a job:", "Enter an emotion:", "Enter an object:", "Enter a place:", "Enter a verb:"},
+   template = "%s was a %s who was always %s. One day, %s found a magical %s in %s. %s used it to %s the whole world."
+  }
+ }
+ 
+ local story = stories[math.random(#stories)]
+ local inputs = {}
+ 
+ term.clear()
+ term.setCursorPos(1,1)
+ print("Welcome to Mad Libs!")
+ 
+ for i, prompt in ipairs(story.prompt) do
+  inputs[i] = getInput(prompt)
+ end
+ 
+ local finalStory = string.format(story.template, table.unpack(inputs))
+ 
+ term.clear()
+ term.setCursorPos(1,1)
+ print("Here's your Mad Libs story:")
+ print(finalStory)
+ 
+ term.setCursorPos(1, term.getSize())
+ print("Press any key to quit...")
+ os.pullEvent("key")
+end
+
+madLibsGame()
+
+shell.run("/smoothieos/back")

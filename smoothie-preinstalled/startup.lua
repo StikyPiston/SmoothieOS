@@ -1,0 +1,6 @@
+shell.openTab("/smoothieos/stats.lua")
+shell.run("/smoothieos/os.lua")
+shell.setAlias("edit","/micro")
+shell.setAlias("back", "/smoothieos/back" )
+shell.setAlias("pineget", "/pineget")
+shell.setAlias("conf", "/smoothieos/conf")

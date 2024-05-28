@@ -1,0 +1,119 @@
+require("config")
+--require("os")
+require("ver")
+
+--os.pullEvent = os.pullEventRaw
+
+local args = { ... }
+
+if args then
+ if args=="Debug" then
+  shell.openTab("shell")
+ end
+end
+
+local w,h = term.getSize()
+
+--PrintCentered FUnction
+
+function printCentered(y,s)
+ local x = math.floor((w - string.len(s)) /2)
+ term.setCursorPos(x,y)
+ term.clearLine()
+ term.write(s)
+end
+
+--Draw menu indicator
+
+local nOption = 1
+
+local function drawMenu()
+ term.clear()
+ term.setCursorPos(1,1)
+ term.write("smoothieOS " .. version)
+ 
+ term.setCursorPos(w-11,1)
+ if nOption == 1 then
+  term.write("Email")
+ elseif nOption == 2 then
+  term.write("Send File")
+ elseif nOption == 3 then
+  term.write("Get file")
+ elseif nOption == 4 then
+  term.write("Buid Installer")
+ elseif nOption == 5 then
+  term.write("App Market")
+ elseif nOption == 6 then
+  term.write("Games")
+ elseif nOption == 7 then
+  term.write("Back")
+ end
+end
+
+--Draws GUI
+
+term.clear()
+
+local function drawFrontend()
+ printCentered(math.floor(h/2) -3, "")
+ printCentered(math.floor(h/2) -2, "smoothieOS Menu")
+ printCentered(math.floor(h/2) -1, "")
+ printCentered(math.floor(h/2) +0, ((nOption == 1) and "[ Email ]") or "  Email  ")
+ printCentered(math.floor(h/2) +1, ((nOption == 2) and "[ Send File ]") or "  Send File  ")
+ printCentered(math.floor(h/2) +2, ((nOption == 3) and "[ Get File ]") or "  Get File  ")
+ printCentered(math.floor(h/2) +3, ((nOption == 4) and "[ Build Install Media ] ") or " Build Install Media ")
+ printCentered(math.floor(h/2) +4, ((nOption == 5) and "[ App Market ]") or "  App Market  ")
+ printCentered(math.floor(h/2) +5, ((nOption == 6) and "[ Games ]") or "  Games  ")
+ printCentered(math.floor(h/2) +6, ((nOption == 7) and "[ <- ]") or "  <-  ")
+end
+
+--Display
+
+drawMenu()
+drawFrontend()
+
+while true do
+ local e,p = os.pullEvent()
+ 
+ if e == "key" then
+  local key = p
+  
+  if key == keys.up or key == keys.right then
+  
+   if nOption > 1 then
+    nOption = nOption - 1
+    drawMenu()
+    drawFrontend()
+   end
+   
+  elseif key == keys.down or key == keys.left then
+   if nOption < 7 then
+    nOption = nOption + 1
+    drawMenu()
+    drawFrontend()
+   end
+ elseif key == keys.enter then
+  break
+ end
+end
+end
+
+term.clear()
+
+--Selecting Menus
+
+if nOption == 1 then
+ shell.run("/smoothieos/email")
+elseif nOption == 2 then
+ shell.run("/smoothieos/sendfile")
+elseif nOption == 3 then
+ shell.run("/smoothieos/getfile")
+elseif nOption == 4 then
+ shell.run("/smoothieos/buildinstaller")
+elseif nOption == 5 then
+ shell.run("/smoothieos/pinestore")
+elseif nOption == 6 then
+ shell.run("/smoothieos/games")
+elseif nOption == 7 then
+ shell.run("/smoothieos/back")
+end

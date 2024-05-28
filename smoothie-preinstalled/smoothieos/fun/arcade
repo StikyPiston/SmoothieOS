@@ -1,0 +1,146 @@
+--SmoothieOS Arcade
+
+local function runGame(game)
+ local gamePath = fs.combine("games", game .. ".lua")
+ if fs.exists(gamePath)then
+ 
+ else
+  printError("Error (SoA-L-6) cannot access game!")
+ end
+end
+
+local function fetchGameList()
+ local url = "https://raw.githubusercontent.com/StikyPiston/SmoothieOS-Arcade/main/gamelist.txt"
+ local response = http.get(url)
+ 
+ if response then
+  local content = response.readAll()
+  response.close()
+  return textutils.unserialise(content)
+ else
+  return {"Error (SoA-N-1): Unable to download marketplace data."}
+ end
+end
+
+
+local function drawMenu(menu, selected)
+ term.clear()
+ term.setCursorPos(1,1)
+ print("SmoothieOS Arcade")
+ print("-----------------")
+ for i, item in ipairs(menu)do
+  if i==selected then
+   print("-> " .. item)
+  else
+   print("   " .. item)
+  end
+ end
+end
+
+local function downloadGame(game)
+ print("Downloading " .. game .. "...")
+ sleep(2)
+ print(game .. "downloaded successfully!")
+end
+
+local function viewLibrary(library)
+ local selected = 1
+ 
+ while true do
+  term.clear()
+  term.setCursorPos(1,1)
+  print("Library")
+  print("-------")
+  for i, game in ipairs(library)do
+   if i == selected then
+    print("-> " .. game)
+   else
+    print("   " .. game)
+   end
+  end
+  print("\nPress [Enter] to launch, [Backspace] to go back") 
+  
+  local event, key = os.pullEvent("key")
+  
+  if key == keys.up then
+   selected = selected - 1
+   if selected < 1 then
+    selected = #library
+   end
+  elseif key == keys.down then
+   selected = selected + 1
+   if selected > #library then
+    selected = 1
+   end
+  elseif key == keys.enter then
+   runGame(library[selected])
+  elseif key == backspace then
+   break
+  end 
+ end
+end
+
+local function updateLibrary(library, game)
+ table.insert(library, game)
+ local file = fs.open("/arcade/library.txt", "w")
+ file.write(textutils.serialize(library))
+ file.close()
+end
+
+local function loadLibrary()
+ if fs.exists("/arcade/library.txt")then
+  local file = fs.open("/arcade/library.txt", "w")
+  local contents = file.readAll()
+  file.close()
+  return textutils.unserialise(contents)
+ else
+  return {}
+ end
+end
+
+local function main()
+ local menu = {"Library", "Marketplace", "Exit"}
+ local selected = 1
+ local library = loadLibrary()
+ 
+ while true do
+  drawMenu(menu, selected)
+  local event, key = os.pullEvent("key")
+   
+  if key == keys.up then
+   selected = selected - 1
+   if selected < 1 then
+    selected = 1
+   end
+  elseif key == keys.down then
+   selected = selected + 1
+   if selected > #menu then
+    selected = 1
+   end
+  elseif key == keys.enter then
+   if menu[selected] == "Library" then
+    viewLibrary(library)
+   elseif menu[selected] == "Marketplace" then
+    term.clear()
+    term.setCursorPos(1,1)
+    print("Marketplace")
+    print("-----------")
+    for i, game in ipairs(gameList)do
+     print(i .. ". " .. game)
+    end
+    print(#gameList + 1 .. ". Back")
+    
+    local choice = tonumber(read())
+    if choice and choice > 0 and choice <= #gameList then
+     local game = gameList[choice]
+     downloadGame(game)
+     updateLibrary(library, game)
+    end
+   elseif menu[selected] == "Exit" then
+    break
+   end
+  end
+ end
+end
+
+main()

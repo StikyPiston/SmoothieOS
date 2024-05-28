@@ -1,0 +1,54 @@
+local e={}local t,a,o=require,{},{startup=e}
+local function i(n)local s=o[n]
+if s~=nil then if s==e then
+error("loop or previous error loading module '"..n..
+"'",2)end;return s end;o[n]=e;local h=a[n]if h then s=h(n)elseif t then s=t(n)else
+error("cannot load '"..n.."'",2)end;if s==nil then s=true end;o[n]=s;return s end
+a["src.utils"]=function(...)local n={}
+function n.getData(s)
+local h=http.get("https://pinestore.cc/api/"..s)if not h then
+print("Failed to GET https://pinestore.cc/api/"..s)return end;local r=h.readAll()h.close()return
+textutils.unserializeJSON(r)end
+function n.postData(s,h)
+local r=http.post("https://pinestore.cc/api/"..s,textutils.serializeJSON(h),{["Content-Type"]="application/json"})if not r then
+print("Failed to POST https://pinestore.cc/api/"..s)return end;local h=r.readAll()r.close()return
+textutils.unserializeJSON(h)end
+function n.openPage(s,...)local h=a["src.pages."..s](arg)local r,d=pcall(h)if
+not r then term.setTextColor(colors.red)print(d)
+term.setTextColor(colors.white)end end
+function n.install(s)local h="apps/"..s.id.."/"fs.makeDir(h)local r=fs.open
+local d=fs.makeDir;local l=fs.exists;function fs.open(m,f)
+if m:sub(1,12)=="rom/programs"then return r(m,f)end;return r(h..m,f)end
+function fs.makeDir(m)if
+m:sub(1,12)=="rom/programs"then return d(m)end;return d(h..m)end;function fs.exists(m)if m:sub(1,12)=="rom/programs"then return l(m)end;return
+l(h..m)end
+local u,c=xpcall(shell.run,debug.traceback,s.install_command)n.postData("log/download",{projectId=s.id})if not u then
+print(c)end;fs.open=r;fs.makeDir=d;fs.exists=l end;return n end
+a["src.pages.projects"]=function(...)local n=i("src.utils")
+local s=n.getData("projects").projects;local h=1;local r,d=term.getSize()local l=d-3;local u=1;local c=1;local m=l;local f;for y=#s,1,-1 do
+if
+not s[y].install_command or not s[y].target_file then table.remove(s,y)end end
+local function w()term.clear()
+term.setCursorPos(1,1)
+for y=1,l do local p=y+ (u-1)*l
+if s[p]then f=s[p].name
+if not term.isColor()then if h==p then f="> "..
+s[p].name end else
+if h==p then
+term.setTextColor(colors.blue)else term.setTextColor(colors.gray)end end;print(f)else break end end;term.setTextColor(colors.white)
+term.setCursorPos(1,d-1)
+print("Selected project "..h.." of "..#s)end
+while true do w()local y,p=os.pullEvent("key")
+if keys.getName(p)=="up"then if
+h==c and u>1 then u=u-1;c=c-l;m=m-l end;if h>1 then h=h-1 end elseif
+keys.getName(p)=="down"then if h==m and h<#s then u=u+1;c=c+l;m=m+l end;if h<#s then h=h+1 end end;if keys.getName(p)=="enter"then
+n.openPage("project",s[h].id)break end end end
+a["src.pages.project"]=function(...)local n=...local s=i("src.utils")
+local h=s.getData("project/"..n[1]).project
+local function r()term.clear()term.setCursorPos(1,1)print(h.name..
+" - "..h.owner_name)print()
+print("Press enter to install")print()print(h.description)end
+while true do r()local d,l=os.pullEvent("key")if keys.getName(l)=="enter"then
+s.install(h)break end;if keys.getName(l)=="backspace"then
+s.openPage("projects")break end end end
+a["src.main"]=function(...)i("src.pages.projects")end;return a["src.main"](...)

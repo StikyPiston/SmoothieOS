@@ -1,0 +1,69 @@
+term.clear()
+term.clear()
+term.setCursorPos(1,1)
+
+term.write("What's your username? > ")
+
+usr = read()
+print(usr)
+print(type(usr))
+
+user = usr or "Anonymous"
+testString = "Anonymous"
+
+term.write("What's your Chat Channel? > ")
+
+channel = read()
+print(channel)
+
+rednet.host("chat", channel)
+
+local function sendMessage(channel, user, msg)
+ local fullMessage = "<" .. testString .. "> " .. msg
+ rednet.broadcast(fullmessage, "chat")
+end
+
+local messages = {}
+
+local function renderScreen()
+ term.clear()
+ term.setCursorPos(1,1)
+ print("Chatterbox! Channel: " .. channel)
+ local width, height = term.getSize()
+ for i = 1, #messages do
+  term.setCursorPos(1, i + 1)
+  print(messages[i])
+ end
+ term.setCursorPos(1, height)
+ write("> ")
+end
+
+local function receiveMessages(channel)
+ while true do
+  local senderID, message, protocol = rednet.receive("chat")
+  if protocol == "chat" then
+   table.insert(messages, message)
+   if #messages > (term.getSize() - 3) then
+    table.remove(messages, 1)
+   end
+   renderScreen()
+  end
+ end
+end
+
+local function handleInput(channel, user)
+ while true do
+  term.setCursorPos(1, term.getSize())
+  term.clearLine()
+  write("> ")
+  local msg = read()
+  sendMessage(channel, user, msg)
+ end
+end
+
+parallel.waitForAny(receiveMessages, function()
+ while true do
+  renderScreen()
+  sleep(0.5)
+ end
+end, handleInput)

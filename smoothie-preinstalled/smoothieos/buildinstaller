@@ -1,0 +1,31 @@
+require("ver")
+
+term.clear()
+term.setCursorPos(1,1)
+print("=== Welcome to the SmothieOS Install Media Builder ===")
+
+--Starts the logic for building the Install Media
+term.write("Insert a blank floppy and press ENTER to make the media > ")
+read()
+
+textutils.slowPrint("Making Disk 1")
+shell.run("cp /smoothieos/buildmedia1/* /disk/media/*")
+shell.run("cp /smoothieos/buildmedia1-startup/* /disk/*")
+disk.setLabel("SmoothieOS " .. version .. " installer (1/1)")
+disk.eject("bottom")
+
+
+--Makes Install disk 2
+
+term.write("Insert another blank floppy and press ENTER to make Disk 2")
+read()
+
+textutils.slowPrint("Making Disk 2")
+shell.run("cp /smoothieos/buildmedia2/* /disk/media/*")
+shell.run("cp /smoothieos/buildmedia2-startup/* /disk/*")
+disk.setLabel("SmothieOS " .. version .. " installer (2/2) Programs")
+disk.eject("bottom")
+
+print("Install media created successfully!")
+sleep(2)
+shell.run("back")

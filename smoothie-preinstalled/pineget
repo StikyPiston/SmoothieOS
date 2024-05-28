@@ -1,0 +1,27 @@
+require("lib.termLib")
+
+tc()
+
+local args = { ... }
+local idToInstall = args[1]
+
+local prevDir = shell.dir()
+local dir = "/apps/" .. args[1]
+
+if not fs.exists(dir)then
+ fs.makeDir(dir)
+end
+
+if #args > 1 then
+ print("Too Many Arguments Provided!")
+ return
+elseif #args == 1 then
+ term.setTextColor(colors.lime)
+ print("Installing App: " .. idToInstall)
+ shell.setDir(dir)
+ shell.run("wget run https://pinestore.cc/d/" .. idToInstall)
+ shell.setDir(prevDir)
+else
+ print("No App ID Provided")
+ return
+end

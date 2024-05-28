@@ -1,0 +1,84 @@
+local function getInput(prompt)
+ term.setCursorPos(1, term.getCursorPos() +1)
+ print(prompt)
+ term.setCursorPos(1, term.getCursorPos() +1)
+ return read()
+end
+
+local function game()
+ local stories = {
+  {
+   prompt = {
+    name = "Enter a name:",
+    place = "Enter a place:",
+    animal = "Enter an animal:",
+    action = "Enter a verb:",
+    object = "Enter an object:",
+    adjective = "Enter an adjective:"
+   },
+   template = "Once upon a time, {name} went to {place}. While there, {name} saw a {adjective} {animal}. It was {adjective} and decided to {leave}"
+  },
+  {
+   prompt = {
+    name = "Enter a name:",
+    food = "Enter a food:",
+    color = "Enter a color:",
+    verb_ing = "Enter a verb ending in -ing:",
+    place = "Enter a place:",
+    plural_noun = "Enter a plural noun:"
+   },
+   template = "One day, {name} was very hungry. {name} wanted to eat some {color} {food}. So {name} started {verb_ing} to the {place} to find some {plural_noun}."
+  },
+  {
+   prompt = {
+    name = "Enter name:",
+    vehicle = "Enter a vehicle:",
+    destination = "Enter a destination:",
+    number = "Enter a number:",
+    adjective = "Enter an adjective:",
+    past_tense_verb = "Enter a past-tense verb:"
+   },
+   template = "One day, {name} decided to go on an adventure. {name} took a {vehicle} to {destination}. After travelling for {number} hours, {name} felt {adjective} and {past_tense_verb} to rest."
+  },
+  {
+   prompt = {
+    name = "Enter a name:",
+    job = "Enter a job:",
+    emotion = "Enter an emotion:",
+    object = "Enter an object:",
+    place = "Enter a place:",
+    verb = "Enter a verb:"
+   },
+   template = "{name} was a {job} who was always {emotion}. One day, {name} found a magical {object} in {place}. {name} used it to {verb} the whole world."
+  }
+}
+
+local story = stories[math.random(#stories)]
+local inputs = {}
+
+term.clear()
+term.setCursorPos(1,1)
+print("Welcome to Mad Libs!")
+
+for key, value in pairs(story.prompt)do
+ inputs[key] = getInput(prompt)
+end
+
+local finalStory = story.template
+for key,value in pairs(inputs)do
+ finalStory = finalStory:gsub("{" .. key .. "}", value)
+end
+
+term.clear()
+term.setCursorPos(1,1)
+print("Here's your Mad Libs story:")
+print(finalStory)
+
+term.setCursorPos(1,9)
+print("Press a key to quit...")
+os.pullEvent("key")
+end
+
+game()
+
+shell.run("/smoothieos/back")
